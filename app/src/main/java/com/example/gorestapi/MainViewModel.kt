@@ -8,7 +8,9 @@ import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.headers
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.http.path
@@ -25,8 +27,12 @@ class MainViewModel: ViewModel() {
     var hostUrl = "gorest.co.in"
     val authValue = "Bearer 8d9a9d2a6de3123f4ca1acf6375037746da0923d456bf5d07ca82eee2ea8b02b"
     var httpClient: HttpClient? = null
+
     private var _users = MutableStateFlow<List<User>>(emptyList())
     val users = _users.asStateFlow()
+
+    private var _user = MutableStateFlow<User?>(null)
+    val user = _user.asStateFlow()
 
     init {
         httpClient = HttpClient(Android) {
@@ -35,6 +41,19 @@ class MainViewModel: ViewModel() {
             }
         }
         getUsers()
+    }
+
+    fun getUser(uid: Int) {
+        viewModelScope.launch {
+            val response = httpClient?.get("https://gorest.co.in/public/v2/users/${uid}") {
+                headers {
+                    append(HttpHeaders.Accept, "application/json")
+                    append(HttpHeaders.Authorization, "Bearer 8d9a9d2a6de3123f4ca1acf6375037746da0923d456bf5d07ca82eee2ea8b02b")
+
+                }
+            }
+            _user.value = response?.body<User>()
+        }
     }
 
     fun getUsers() {

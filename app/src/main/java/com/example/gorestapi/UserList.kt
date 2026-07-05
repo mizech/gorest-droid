@@ -54,7 +54,7 @@ fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewMode
                         .padding(horizontal = 20.dp)
                         .padding(bottom = 20.dp)
                         .clickable {
-                            backStack.add(Routes.UserDetails)
+                            backStack.add(Routes.UserDetails(mainVM = mainVM, uid = it.id))
                         }) {
                         Card(modifier = Modifier
                             .padding(horizontal = 20.dp)
@@ -81,3 +81,5 @@ fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewMode
         }
     }
 }
+
+

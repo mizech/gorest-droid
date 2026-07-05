@@ -35,7 +35,9 @@ class MainActivity : ComponentActivity() {
                                 UserList(backStack = backStack)
                             }
                             is Routes.UserDetails -> NavEntry(key) {
-                                UserDetails(backStack = backStack)
+                                UserDetails(backStack = backStack,
+                                    mainVM = key.mainVM,
+                                    uid = key.uid)
                             }
                             else -> NavEntry(Unit) {
                                 Text("Unknown route!")
