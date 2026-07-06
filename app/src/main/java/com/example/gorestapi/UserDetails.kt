@@ -3,10 +3,14 @@ package com.example.gorestapi
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,6 +25,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+@Composable
+fun LabelValueRow(label: String, value: String) {
+    val fontSize = 22.sp
+
+    Row(horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()) {
+        Text(label,
+            fontWeight = FontWeight.Bold,
+            fontSize = fontSize)
+        Text(value,
+            fontSize = fontSize)
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -41,21 +59,25 @@ fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: I
                     contentDescription = "")
             }
         })
-    }) {
+    }) { innerPadding ->
         Column(verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
             modifier = Modifier.fillMaxSize()
                                 .padding(horizontal = 25.dp)
-                                .padding(vertical = 20.dp)) {
-            Text("Name: ${user?.name ?: ""}",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold)
-            Text("Email: ${user?.email ?: ""}",
-                fontSize = 20.sp)
-            Text("Gender: ${user?.gender ?: ""}",
-                fontSize = 20.sp)
-            Text("Status: ${user?.status ?: ""}",
-                fontSize = 20.sp)
+                                .padding(vertical = innerPadding.calculateTopPadding())) {
+            LabelValueRow("Name: ", user?.name ?: "")
+            LabelValueRow("Email: ", user?.email ?: "")
+            LabelValueRow("Gender: ", user?.gender ?: "")
+            LabelValueRow("Status: ", user?.status ?: "")
+            Row(horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 15.dp)) {
+                ElevatedButton(onClick = {}) {
+                    Text("Delete")
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
