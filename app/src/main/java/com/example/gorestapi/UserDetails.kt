@@ -1,5 +1,6 @@
 package com.example.gorestapi
 
+import android.R.id.message
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,7 +46,6 @@ fun LabelValueRow(label: String, value: String) {
 @Composable
 fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: Int) {
     mainVM.getUser(uid = uid)
-
     var user = mainVM.user.collectAsState().value
 
     Scaffold(topBar = {
@@ -63,18 +63,23 @@ fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: I
         Column(verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
             modifier = Modifier.fillMaxSize()
-                                .padding(horizontal = 25.dp)
-                                .padding(vertical = innerPadding.calculateTopPadding())) {
+                .padding(horizontal = 25.dp)
+                .padding(vertical = innerPadding.calculateTopPadding())) {
             LabelValueRow("Name: ", user?.name ?: "")
             LabelValueRow("Email: ", user?.email ?: "")
             LabelValueRow("Gender: ", user?.gender ?: "")
             LabelValueRow("Status: ", user?.status ?: "")
-            Row(horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 15.dp)) {
-                ElevatedButton(onClick = {}) {
-                    Text("Delete")
+            if (user?.id != null) { // Todo: Progress-Indikator while loading.
+                Row(horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 15.dp)) {
+                    ElevatedButton(onClick = {
+                        mainVM.deleteUser(uid = user.id)
+                        backStack.removeLastOrNull()
+                    }) {
+                        Text("Delete")
+                    }
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
