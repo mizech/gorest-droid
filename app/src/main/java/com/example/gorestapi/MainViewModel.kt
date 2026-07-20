@@ -1,5 +1,8 @@
 package com.example.gorestapi
 
+import android.R.bool
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.HttpClient
@@ -16,16 +19,16 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
+import io.ktor.http.headers
 import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import java.util.Calendar
-import java.util.Date
+import java.time.LocalDate
+import java.util.Objects
+
 
 class MainViewModel: ViewModel() {
     var hostUrl = "gorest.co.in"
@@ -50,7 +53,6 @@ class MainViewModel: ViewModel() {
     }
 
     fun addUser(user: String, email: String, gender: String, status: String) {
-        println("Values: ${user}, ${email}, ${gender}, ${status}")
         viewModelScope.launch {
             try {
                 val response = httpClient?.post("https://gorest.co.in/public/v2/users") {
@@ -98,26 +100,23 @@ class MainViewModel: ViewModel() {
 
     fun getUsers() {
         viewModelScope.launch {
-            val response = httpClient?.get {
-                url {
-                    contentType(ContentType.Application.Json)
-                    header("Authorization", authValue)
-                    protocol = URLProtocol.HTTPS
-                    host = hostUrl
-                    path("/public/v2/users")
+            try {
+                val response = httpClient?.get("https://gorest.co.in/public/v2/users/") {
+                    headers {
+                        append(HttpHeaders.Accept, "application/json")
+                        append(HttpHeaders.Authorization, authValue)
+                    }
                 }
-            }
 
-            if (response != null && response.status.value.toString().substring(0, 1) == "2") {
-                try {
+                if (response != null && response.status.value.toString().substring(0, 1) == "2") {
                     _users.value = response.body<List<User>>() ?: emptyList()
-                } catch(exc: Exception) {
-                    println(exc.message)
-                    println(" ---------- ")
-                    println(exc.stackTrace)
+                } else {
+                    println("Response error-code: ${response?.status?.value.toString()}")
                 }
-            } else {
-                println("Response error-code: ${response?.status?.value.toString()}")
+            } catch (exc: Exception) {
+                println(exc.message)
+                println(" ---------- ")
+                println(exc.stackTrace)
             }
         }
     }

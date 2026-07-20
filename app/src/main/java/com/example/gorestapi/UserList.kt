@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -45,62 +44,16 @@ fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewMode
     val users = mainVM.users.collectAsState().value
     var isAddNewUserDialogShown = remember { mutableStateOf(false) }
 
-    @Composable
-    fun AddNewUserDialog(isDialogShown: MutableState<Boolean>, mainVM: MainViewModel) {
-        var name = rememberTextFieldState()
-        val email = rememberTextFieldState()
-        var gender = rememberTextFieldState()
-        var status = rememberTextFieldState()
-
-        Dialog(onDismissRequest = {
-            isAddNewUserDialogShown.value = false
-        }) {
-            Card(modifier = Modifier.fillMaxWidth()
-                .height(480.dp)
-                .padding(20.dp)) {
-                Column(modifier = Modifier.fillMaxSize().padding(25.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Add new user", fontSize = 24.sp)
-                    OutlinedTextField(
-                        state = name
-                    , modifier = Modifier.padding(bottom = 8.dp).padding(top = 8.dp))
-                    OutlinedTextField(
-                        state = email
-                    , modifier = Modifier.padding(bottom = 8.dp))
-                    OutlinedTextField(
-                        state = gender
-                    , modifier = Modifier.padding(bottom = 8.dp))
-                    OutlinedTextField(
-                        state = status
-                    )
-                    Row(modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround) {
-                        Button(onClick = {
-                            mainVM.addUser(
-                                user = name.text.toString(),
-                                email = email.text.toString(),
-                                gender = gender.text.toString(),
-                                status = status.text.toString())
-                            isDialogShown.value = false
-                        }, modifier = Modifier.padding(vertical = 25.dp)) {
-                            Text("Add")
-                        }
-                        Button(onClick = {
-                            isAddNewUserDialogShown.value = false
-                        }, modifier = Modifier.padding(vertical = 25.dp)) {
-                            Text("Cancel")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     Scaffold() { innerPadding ->
         Box {
             if (isAddNewUserDialogShown.value == true) {
-                AddNewUserDialog(isDialogShown = isAddNewUserDialogShown, mainVM = mainVM)
+                UserDialog(isDialogShown = isAddNewUserDialogShown) { name, email, gender, status ->
+                    mainVM.addUser(
+                        user = name,
+                        email = email,
+                        gender = gender,
+                        status = status)
+                }
             } else {
                 Column(verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
