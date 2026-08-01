@@ -21,11 +21,17 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun UserDialog(isDialogShown: MutableState<Boolean>, action: (String, String, String, String) -> Unit) {
-    var name = rememberTextFieldState()
-    val email = rememberTextFieldState()
-    var gender = rememberTextFieldState()
-    var status = rememberTextFieldState()
+fun UserDialog(isDialogShown: MutableState<Boolean>,
+               name: String = "",
+               email: String = "",
+               gender: String = "",
+               status: String = "",
+               uid: Int? = null,
+               action: (String, String, String, String, Int?) -> Unit) {
+    var name = rememberTextFieldState(initialText = name)
+    val email = rememberTextFieldState(initialText = email)
+    var gender = rememberTextFieldState(initialText = gender)
+    var status = rememberTextFieldState(initialText = status)
 
     Dialog(onDismissRequest = {
         isDialogShown.value = false
@@ -53,7 +59,7 @@ fun UserDialog(isDialogShown: MutableState<Boolean>, action: (String, String, St
                     horizontalArrangement = Arrangement.SpaceAround) {
                     Button(onClick = {
                         action(name.text.toString(), email.text.toString(),
-                            gender.text.toString(), status.text.toString())
+                            gender.text.toString(), status.text.toString(), uid)
                         isDialogShown.value = false
                     }, modifier = Modifier.padding(vertical = 25.dp)) {
                         Text("Add")
@@ -68,3 +74,4 @@ fun UserDialog(isDialogShown: MutableState<Boolean>, action: (String, String, St
         }
     }
 }
+

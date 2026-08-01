@@ -47,7 +47,8 @@ fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewMode
     Scaffold() { innerPadding ->
         Box {
             if (isAddNewUserDialogShown.value == true) {
-                UserDialog(isDialogShown = isAddNewUserDialogShown) { name, email, gender, status ->
+                UserDialog(isDialogShown = isAddNewUserDialogShown) {
+                    name, email, gender, status, _ ->
                     mainVM.addUser(
                         user = name,
                         email = email,
@@ -95,7 +96,11 @@ fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewMode
                 }
                 Row(horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier.padding(35.dp).fillMaxSize()) {
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(end = 25.dp)
+                        .padding(bottom = 25.dp)
+                        .fillMaxSize()) {
                     FloatingActionButton(onClick = {
                         isAddNewUserDialogShown.value = !isAddNewUserDialogShown.value
                     }) {

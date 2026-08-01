@@ -10,8 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.example.gorestapi.ui.theme.GoRESTAPITheme
-import java.util.Date
-import java.util.Objects
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

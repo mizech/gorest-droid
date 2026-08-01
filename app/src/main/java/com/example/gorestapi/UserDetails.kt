@@ -20,6 +20,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +49,9 @@ fun LabelValueRow(label: String, value: String) {
 fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: Int) {
     mainVM.getUser(uid = uid)
     var user = mainVM.user.collectAsState().value
+    var isEditUserDialogShown = remember() {
+        mutableStateOf(false)
+    }
 
     Scaffold(topBar = {
         TopAppBar(title = {
@@ -54,35 +59,55 @@ fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: I
         }, navigationIcon = {
             IconButton(onClick = {
                 backStack.removeLastOrNull()
+                mainVM.getUsers()
             }) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "")
             }
         })
     }) { innerPadding ->
-        Column(verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.fillMaxSize()
-                .padding(horizontal = 25.dp)
-                .padding(vertical = innerPadding.calculateTopPadding())) {
-            LabelValueRow("Name: ", user?.name ?: "")
-            LabelValueRow("Email: ", user?.email ?: "")
-            LabelValueRow("Gender: ", user?.gender ?: "")
-            LabelValueRow("Status: ", user?.status ?: "")
-            if (user?.id != null) { // Todo: Progress-Indikator while loading.
-                Row(horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 15.dp)) {
-                    ElevatedButton(onClick = {
-                        mainVM.deleteUser(uid = user.id)
-                        backStack.removeLastOrNull()
-                    }) {
-                        Text("Delete")
+        if (isEditUserDialogShown.value == false) {
+            Column(verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.fillMaxSize()
+                    .padding(horizontal = 25.dp)
+                    .padding(vertical = innerPadding.calculateTopPadding())) {
+                LabelValueRow("Name: ", user?.name ?: "")
+                LabelValueRow("Email: ", user?.email ?: "")
+                LabelValueRow("Gender: ", user?.gender ?: "")
+                LabelValueRow("Status: ", user?.status ?: "")
+                if (user?.id != null) { // Todo: Progress-Indikator while loading.
+                    Row(horizontalArrangement = Arrangement.Absolute.SpaceAround,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 15.dp)) {
+                        ElevatedButton(onClick = {
+                            mainVM.deleteUser(uid = user.id)
+                            backStack.removeLastOrNull()
+                        }) {
+                            Text("Delete")
+                        }
+                        ElevatedButton(onClick = {
+                            isEditUserDialogShown.value = !isEditUserDialogShown.value
+                        }) {
+                            Text("Edit")
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.weight(1f))
             }
-            Spacer(modifier = Modifier.weight(1f))
+        } else {
+            UserDialog(isDialogShown = isEditUserDialogShown,
+                name = user?.name ?: "", email = user?.email ?: "",
+                gender = user?.gender ?: "", status = user?.status ?: "",
+                uid = user?.id,
+                ) { name, email, gender, status, uid ->
+                uid?.let {
+                    mainVM.updateUser(uid = uid, name = name,
+                        email = email, gender = gender,
+                        status = status)
+                }
+            }
         }
     }
 }

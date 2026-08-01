@@ -14,24 +14,25 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
-import io.ktor.http.headers
-import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.json.Json
-import java.time.LocalDate
-import java.util.Objects
-
+import java.time.LocalDateTime
 
 class MainViewModel: ViewModel() {
-    var hostUrl = "gorest.co.in"
     val authValue = "Bearer 8d9a9d2a6de3123f4ca1acf6375037746da0923d456bf5d07ca82eee2ea8b02b"
     var httpClient: HttpClient? = null
 
@@ -51,7 +52,8 @@ class MainViewModel: ViewModel() {
         }
         getUsers()
     }
-
+    // Todo: Implement validation.
+    // Todo: Implement drop-downs for gender and status.
     fun addUser(user: String, email: String, gender: String, status: String) {
         viewModelScope.launch {
             try {
@@ -69,7 +71,7 @@ class MainViewModel: ViewModel() {
 
                 if (response?.status?.value.toString().startsWith("2")) {
                     getUsers()
-                } else {
+                } else { // Todo: Display error-messages.
                     throw Exception("Status code unequal 200.")
                 }
             } catch (exc: Exception) {
@@ -136,6 +138,29 @@ class MainViewModel: ViewModel() {
             }
 
             getUsers()
+        }
+    }
+
+    fun updateUser(uid: Int, name: String, email: String, gender: String, status: String) {
+        viewModelScope.launch {
+            try {
+                httpClient?.put("https://gorest.co.in/public/v2/users/${uid}") {
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer 8d9a9d2a6de3123f4ca1acf6375037746da0923d456bf5d07ca82eee2ea8b02b")
+                        append(HttpHeaders.Accept, "application/json")
+                    }
+                    
+                    val user = User(id = uid, name = name, email = email,
+                        gender = gender, status = status)
+                    setBody(user)
+                    contentType(ContentType.Application.Json)
+
+                    getUser(uid = uid)
+                }
+            } catch (exc: Exception) {
+                println(exc.message)
+                println(exc.stackTrace)
+            }
         }
     }
 }
