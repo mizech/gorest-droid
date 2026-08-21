@@ -1,6 +1,7 @@
 package com.example.gorestapi
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,12 +9,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,20 +35,22 @@ import androidx.compose.ui.window.Dialog
 fun UserDialog(isDialogShown: MutableState<Boolean>,
                name: String = "",
                email: String = "",
-               gender: String = "",
+               gender: Gender = Gender.MALE,
                status: String = "",
                uid: Int? = null,
                action: (String, String, String, String, Int?) -> Unit) {
     var name = rememberTextFieldState(initialText = name)
     val email = rememberTextFieldState(initialText = email)
-    var gender = rememberTextFieldState(initialText = gender)
+    var selectedGender by remember { mutableStateOf(gender) }
     var status = rememberTextFieldState(initialText = status)
+
+    var isGenderExpanded by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = {
         isDialogShown.value = false
     }) {
         Card(modifier = Modifier.fillMaxWidth()
-            .height(480.dp)
+            .height(540.dp)
             .padding(20.dp)) {
             Column(modifier = Modifier.fillMaxSize().padding(25.dp),
                 verticalArrangement = Arrangement.Center,
@@ -49,9 +62,32 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
                 OutlinedTextField(
                     state = email
                     , modifier = Modifier.padding(bottom = 8.dp))
-                OutlinedTextField(
-                    state = gender
-                    , modifier = Modifier.padding(bottom = 8.dp))
+                Box(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()) {
+                        Text(text = "Gender: ${selectedGender.label}")
+                        IconButton(onClick = { isGenderExpanded = !isGenderExpanded }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "")
+                        }
+                    }
+                    DropdownMenu(expanded = isGenderExpanded, onDismissRequest = {
+                        isGenderExpanded = false
+                    }) {
+                        DropdownMenuItem(text = {
+                            Text(Gender.MALE.label)
+                        }, onClick = {
+                            selectedGender = Gender.MALE
+                            isGenderExpanded = false
+                        })
+                        DropdownMenuItem(text = {
+                            Text(Gender.FEMALE.label)
+                        }, onClick = {
+                            selectedGender = Gender.FEMALE
+                            isGenderExpanded = false
+                        })
+                    }
+                }
                 OutlinedTextField(
                     state = status
                 )
@@ -59,7 +95,7 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
                     horizontalArrangement = Arrangement.SpaceAround) {
                     Button(onClick = {
                         action(name.text.toString(), email.text.toString(),
-                            gender.text.toString(), status.text.toString(), uid)
+                            selectedGender.label, status.text.toString(), uid)
                         isDialogShown.value = false
                     }, modifier = Modifier.padding(vertical = 25.dp)) {
                         Text("Add")

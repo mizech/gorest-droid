@@ -54,6 +54,7 @@ class MainViewModel: ViewModel() {
     }
     // Todo: Implement validation.
     // Todo: Implement drop-downs for gender and status.
+    // Todo: List isn't updated, when navigating back from details.
     fun addUser(user: String, email: String, gender: String, status: String) {
         viewModelScope.launch {
             try {
