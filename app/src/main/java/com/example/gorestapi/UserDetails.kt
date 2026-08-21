@@ -97,7 +97,7 @@ fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: I
                 Spacer(modifier = Modifier.weight(1f))
             }
         } else {
-            UserDialog(isDialogShown = isEditUserDialogShown // Todo: Edit doesn't work
+            UserDialog(isDialogShown = isEditUserDialogShown
                 , name = user?.name ?: "", email = user?.email ?: "",
                     gender = Gender.MALE, status = user?.status ?: "", uid = user?.id
                 ) { name, email, gender, status, uid ->

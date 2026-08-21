@@ -62,7 +62,7 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
                 OutlinedTextField(
                     state = email
                     , modifier = Modifier.padding(bottom = 8.dp))
-                Box(modifier = Modifier.padding(16.dp)) {
+                Box(modifier = Modifier.padding(16.dp)) { // Todo: Fix preselected gender. Doesn't show actual gender.
                     Row(verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()) {
@@ -98,7 +98,7 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
                             selectedGender.label, status.text.toString(), uid)
                         isDialogShown.value = false
                     }, modifier = Modifier.padding(vertical = 25.dp)) {
-                        Text("Add")
+                        Text(if (uid == null) "Add" else "Edit")
                     }
                     Button(onClick = {
                         isDialogShown.value = false
