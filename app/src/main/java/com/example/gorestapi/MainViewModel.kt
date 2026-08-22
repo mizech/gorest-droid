@@ -73,7 +73,7 @@ class MainViewModel: ViewModel() {
                 if (response?.status?.value.toString().startsWith("2")) {
                     getUsers()
                 } else { // Todo: Display error-messages.
-                    throw Exception("Status code unequal 200.")
+                    throw Exception("Status code: ${response?.status?.value.toString()}")
                 }
             } catch (exc: Exception) {
                 println(exc.message)

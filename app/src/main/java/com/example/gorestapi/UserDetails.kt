@@ -97,9 +97,25 @@ fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: I
                 Spacer(modifier = Modifier.weight(1f))
             }
         } else {
+            var userGender = Gender.MALE
+            val genders = Gender.entries.toTypedArray()
+            for (currGender in genders) {
+                if (currGender.label == user?.gender) {
+                    userGender = currGender
+                }
+            }
+
+            var userStatus = Status.ACTIVE
+            val status = Status.entries.toTypedArray()
+            for (currStatus in status) {
+                if (currStatus.label == user?.status) {
+                    userStatus = currStatus
+                }
+            }
+
             UserDialog(isDialogShown = isEditUserDialogShown
                 , name = user?.name ?: "", email = user?.email ?: "",
-                    gender = Gender.MALE, status = user?.status ?: "", uid = user?.id
+                    gender = userGender, status = userStatus, uid = user?.id
                 ) { name, email, gender, status, uid ->
                 uid?.let {
                     mainVM.updateUser(uid = uid, name = name,

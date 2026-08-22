@@ -36,15 +36,16 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
                name: String = "",
                email: String = "",
                gender: Gender = Gender.MALE,
-               status: String = "",
+               status: Status = Status.ACTIVE,
                uid: Int? = null,
                action: (String, String, String, String, Int?) -> Unit) {
     var name = rememberTextFieldState(initialText = name)
     val email = rememberTextFieldState(initialText = email)
     var selectedGender by remember { mutableStateOf(gender) }
-    var status = rememberTextFieldState(initialText = status)
+    var status by remember { mutableStateOf(status) }
 
     var isGenderExpanded by remember { mutableStateOf(false) }
+    var isStatusExpanded by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = {
         isDialogShown.value = false
@@ -88,14 +89,35 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
                         })
                     }
                 }
-                OutlinedTextField(
-                    state = status
-                )
+                Box(modifier = Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()) {
+                        Text("Status: ${status.label}")
+                        IconButton(onClick = { isStatusExpanded = !isStatusExpanded }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "")
+                        }
+                    }
+                    DropdownMenu(expanded = isStatusExpanded, onDismissRequest = {
+                        isStatusExpanded = false
+                    }) {
+                        DropdownMenuItem(text = {
+                            Text(Status.ACTIVE.label)
+                        }, onClick = {
+                            status = Status.ACTIVE
+                        })
+                        DropdownMenuItem(text = {
+                            Text(Status.INACTIVE.label)
+                        }, onClick = {
+                            status = Status.INACTIVE
+                        })
+                    }
+                }
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround) {
                     Button(onClick = {
                         action(name.text.toString(), email.text.toString(),
-                            selectedGender.label, status.text.toString(), uid)
+                            selectedGender.label, status.label, uid)
                         isDialogShown.value = false
                     }, modifier = Modifier.padding(vertical = 25.dp)) {
                         Text(if (uid == null) "Add" else "Edit")
