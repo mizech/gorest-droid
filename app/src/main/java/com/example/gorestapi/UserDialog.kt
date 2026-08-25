@@ -38,6 +38,7 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
                gender: Gender = Gender.MALE,
                status: Status = Status.ACTIVE,
                uid: Int? = null,
+               mainVM: MainViewModel,
                action: (String, String, String, String, Int?) -> Unit) {
     var name = rememberTextFieldState(initialText = name)
     val email = rememberTextFieldState(initialText = email)
@@ -118,16 +119,21 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
                     Button(onClick = {
                         action(name.text.toString(), email.text.toString(),
                             selectedGender.label, status.label, uid)
-                        isDialogShown.value = false
+
+                        if (mainVM.errorMessage.value.isEmpty()) {
+                            isDialogShown.value = false
+                        }
                     }, modifier = Modifier.padding(vertical = 25.dp)) {
                         Text(if (uid == null) "Add" else "Edit")
                     }
                     Button(onClick = {
+                        mainVM.errorMessage.value = ""
                         isDialogShown.value = false
                     }, modifier = Modifier.padding(vertical = 25.dp)) {
                         Text("Cancel")
                     }
                 }
+                Text(mainVM.errorMessage.value)
             }
         }
     }

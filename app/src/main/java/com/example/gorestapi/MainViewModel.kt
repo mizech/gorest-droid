@@ -3,6 +3,8 @@ package com.example.gorestapi
 import android.R.bool
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.HttpClient
@@ -42,6 +44,9 @@ class MainViewModel: ViewModel() {
     private var _user = MutableStateFlow<User?>(null)
     val user = _user.asStateFlow()
 
+    var errorMessage = mutableStateOf("")
+        private set
+
     init {
         httpClient = HttpClient(Android) {
             install(ContentNegotiation) {
@@ -52,9 +57,28 @@ class MainViewModel: ViewModel() {
         }
         getUsers()
     }
+
+    fun isValid(email: String): Boolean {
+        return Regex(".+@.+\\..+").matches(email)
+    }
+
     // Todo: Implement validation.
     // Todo: List isn't updated, when navigating back from details.
     fun addUser(user: String, email: String, gender: String, status: String) {
+        if (user.isEmpty()) {
+            errorMessage.value = "User name mandatory"
+            return
+        } else {
+            errorMessage.value = ""
+        }
+
+        if (!isValid(email = email)) {
+            errorMessage.value = "Missing/Invalid email"
+            return
+        } else {
+            errorMessage.value = ""
+        }
+
         viewModelScope.launch {
             try {
                 val response = httpClient?.post("https://gorest.co.in/public/v2/users") {
@@ -129,7 +153,7 @@ class MainViewModel: ViewModel() {
             try {
                 httpClient?.delete(urlString = urlStr) {
                     headers {
-                        append(HttpHeaders.Authorization, "Bearer 8d9a9d2a6de3123f4ca1acf6375037746da0923d456bf5d07ca82eee2ea8b02b")
+                        append(HttpHeaders.Authorization, authValue)
                         append(HttpHeaders.Accept, "application/json")
                     }
                 }
@@ -142,11 +166,15 @@ class MainViewModel: ViewModel() {
     }
 
     fun updateUser(uid: Int, name: String, email: String, gender: String, status: String) {
+        if (!isValid(email = email)) {
+            return
+        }
+
         viewModelScope.launch {
             try {
                 httpClient?.put("https://gorest.co.in/public/v2/users/${uid}") {
                     headers {
-                        append(HttpHeaders.Authorization, "Bearer 8d9a9d2a6de3123f4ca1acf6375037746da0923d456bf5d07ca82eee2ea8b02b")
+                        append(HttpHeaders.Authorization, authValue)
                         append(HttpHeaders.Accept, "application/json")
                     }
                     
@@ -164,3 +192,4 @@ class MainViewModel: ViewModel() {
         }
     }
 }
+

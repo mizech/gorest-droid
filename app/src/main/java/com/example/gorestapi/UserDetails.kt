@@ -115,7 +115,8 @@ fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: I
 
             UserDialog(isDialogShown = isEditUserDialogShown
                 , name = user?.name ?: "", email = user?.email ?: "",
-                    gender = userGender, status = userStatus, uid = user?.id
+                    gender = userGender, status = userStatus,
+                    uid = user?.id, mainVM = mainVM
                 ) { name, email, gender, status, uid ->
                 uid?.let {
                     mainVM.updateUser(uid = uid, name = name,
