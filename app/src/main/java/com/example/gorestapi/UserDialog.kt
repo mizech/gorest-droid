@@ -52,7 +52,7 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
         isDialogShown.value = false
     }) {
         Card(modifier = Modifier.fillMaxWidth()
-            .height(540.dp)
+            .height(580.dp)
             .padding(20.dp)) {
             Column(modifier = Modifier.fillMaxSize().padding(25.dp),
                 verticalArrangement = Arrangement.Center,

@@ -1,6 +1,5 @@
 package com.example.gorestapi
 
-import android.R.id.message
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -85,7 +84,7 @@ fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: I
                             mainVM.deleteUser(uid = user.id)
                             backStack.removeLastOrNull()
                         }) {
-                            Text("Delete")
+                            Text("Delete") // Todo: Confirmation-modal.
                         }
                         ElevatedButton(onClick = {
                             isEditUserDialogShown.value = !isEditUserDialogShown.value
@@ -119,7 +118,7 @@ fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: I
                     uid = user?.id, mainVM = mainVM
                 ) { name, email, gender, status, uid ->
                 uid?.let {
-                    mainVM.updateUser(uid = uid, name = name,
+                    mainVM.updateUser(uid = uid, userName = name,
                         email = email, gender = gender,
                         status = status)
                 }

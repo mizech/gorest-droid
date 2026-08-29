@@ -1,9 +1,5 @@
 package com.example.gorestapi
 
-import android.R.bool
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +9,6 @@ import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -22,17 +17,11 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.json.Json
-import java.time.LocalDateTime
+import kotlin.text.isEmpty
 
 class MainViewModel: ViewModel() {
     val authValue = "Bearer 8d9a9d2a6de3123f4ca1acf6375037746da0923d456bf5d07ca82eee2ea8b02b"
@@ -58,25 +47,24 @@ class MainViewModel: ViewModel() {
         getUsers()
     }
 
-    fun isValid(email: String): Boolean {
-        return Regex(".+@.+\\..+").matches(email)
-    }
+    fun validateUserData(userName: String, email: String): Boolean {
+        errorMessage.value = ""
 
-    // Todo: Implement validation.
-    // Todo: List isn't updated, when navigating back from details.
-    fun addUser(user: String, email: String, gender: String, status: String) {
-        if (user.isEmpty()) {
-            errorMessage.value = "User name mandatory"
-            return
-        } else {
-            errorMessage.value = ""
+        if (userName.isEmpty()) {
+            errorMessage.value += "User name mandatory\n"
         }
 
-        if (!isValid(email = email)) {
-            errorMessage.value = "Missing/Invalid email"
+        if (!Regex(".+@.+\\..+").matches(email)) {
+            errorMessage.value += "Missing/Invalid email\n"
+        }
+
+        return errorMessage.value.isEmpty()
+    }
+
+    // Todo: List isn't updated, when navigating back from details.
+    fun addUser(userName: String, email: String, gender: String, status: String) {
+        if (!validateUserData(userName = userName, email = email)) {
             return
-        } else {
-            errorMessage.value = ""
         }
 
         viewModelScope.launch {
@@ -89,7 +77,7 @@ class MainViewModel: ViewModel() {
 
                     contentType(ContentType.Application.Json)
 
-                    setBody(User(name = user.trim(), email = email.trim(),
+                    setBody(User(name = userName.trim(), email = email.trim(),
                         gender = gender.trim(), status = status.trim()))
                 }
 
@@ -165,8 +153,8 @@ class MainViewModel: ViewModel() {
         }
     }
 
-    fun updateUser(uid: Int, name: String, email: String, gender: String, status: String) {
-        if (!isValid(email = email)) {
+    fun updateUser(uid: Int, userName: String, email: String, gender: String, status: String) {
+        if (!validateUserData(userName = userName, email = email)) {
             return
         }
 
@@ -178,7 +166,7 @@ class MainViewModel: ViewModel() {
                         append(HttpHeaders.Accept, "application/json")
                     }
                     
-                    val user = User(id = uid, name = name, email = email,
+                    val user = User(id = uid, name = userName, email = email,
                         gender = gender, status = status)
                     setBody(user)
                     contentType(ContentType.Application.Json)
