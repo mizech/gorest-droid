@@ -17,6 +17,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -32,6 +33,9 @@ class MainViewModel: ViewModel() {
 
     private var _user = MutableStateFlow<User?>(null)
     val user = _user.asStateFlow()
+
+    var isLoading = mutableStateOf(false)
+        private set
 
     var errorMessage = mutableStateOf("")
         private set
@@ -69,7 +73,7 @@ class MainViewModel: ViewModel() {
 
         viewModelScope.launch {
             try {
-                val response = httpClient?.post("https://gorest.co.in/public/v2/users") {
+                val response = httpClient?.post("https://_gorest.co.in/public/v2/users") {
                     headers {
                         append(HttpHeaders.Accept, "application/json")
                         append(HttpHeaders.Authorization, authValue)
@@ -114,6 +118,9 @@ class MainViewModel: ViewModel() {
 
     fun getUsers() {
         viewModelScope.launch {
+            isLoading.value = true
+            delay(5000)
+
             try {
                 val response = httpClient?.get("https://gorest.co.in/public/v2/users/") {
                     headers {
@@ -131,6 +138,8 @@ class MainViewModel: ViewModel() {
                 println(exc.message)
                 println(" ---------- ")
                 println(exc.stackTrace)
+            } finally {
+                isLoading.value = false
             }
         }
     }

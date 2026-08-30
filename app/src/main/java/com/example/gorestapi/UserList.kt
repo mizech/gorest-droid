@@ -10,14 +10,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,7 +49,7 @@ fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewMode
         TopAppBar(title = { Text("User list") })
     }) { innerPadding ->
         Box {
-            if (isAddNewUserDialogShown.value == true) {
+            if (isAddNewUserDialogShown.value) {
                 UserDialog(isDialogShown = isAddNewUserDialogShown, mainVM = mainVM) {
                     name, email, gender, status, _ ->
                     mainVM.addUser(
@@ -56,22 +60,28 @@ fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewMode
                 }
             } else {
                 Column(verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
+                    if (mainVM.isLoading.value) {
+                        Row(modifier = Modifier.fillMaxWidth().padding(top = 80.dp),
+                            horizontalArrangement = Arrangement.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
                     LazyColumn() {
                         items(items = users) {
                             Column(modifier = Modifier
-                                .padding(horizontal = 20.dp)
+                                .padding(horizontal = 12.dp)
                                 .padding(bottom = 20.dp)
                                 .clickable {
                                     backStack.add(Routes.UserDetails(mainVM = mainVM,
                                         uid = it.id ?: 1))
                                 }) {
                                 Card(modifier = Modifier
-                                    .padding(horizontal = 20.dp)
+                                    .padding(horizontal = 10.dp)
                                     .padding(vertical = 5.dp)
                                     .fillMaxWidth()) {
                                     Column(modifier = Modifier
@@ -84,7 +94,16 @@ fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewMode
                                             modifier = Modifier.fillMaxWidth())
                                         Text(it.email,
                                             textAlign = TextAlign.Center,
-                                            fontSize = 20.sp,
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.fillMaxWidth())
+                                        Text("Gender: ${it.gender}",
+                                            textAlign = TextAlign.Center,
+                                            fontSize = 18.sp,
+                                            modifier = Modifier.fillMaxWidth())
+                                        Text("Status: ${it.status}",
+                                            textAlign = TextAlign.Center,
+                                            fontSize = 18.sp,
                                             modifier = Modifier.fillMaxWidth())
                                     }
                                 }

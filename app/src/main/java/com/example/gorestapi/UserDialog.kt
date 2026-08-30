@@ -77,7 +77,7 @@ fun UserDialog(isDialogShown: MutableState<Boolean>,
                     trailingIcon = {
                         Icon(Icons.Default.Cancel, contentDescription = "",
                             modifier = Modifier.clickable {
-                                name.clearText()
+                                email.clearText()
                             })
                     })
                 Box(modifier = Modifier.padding(16.dp)) {
