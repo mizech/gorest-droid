@@ -1,6 +1,7 @@
 package com.example.gorestapi
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,6 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewModel()) {
     val users = mainVM.users.collectAsState().value
     var isAddNewUserDialogShown = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Scaffold(topBar = {
         TopAppBar(title = { Text("User list") })
@@ -69,6 +72,9 @@ fun UserList(backStack: SnapshotStateList<Any>, mainVM: MainViewModel = viewMode
                             horizontalArrangement = Arrangement.Center) {
                             CircularProgressIndicator()
                         }
+                    } else if (mainVM.errorMessage.value.isEmpty() == false) {
+                        Toast.makeText(context, mainVM.errorMessage.value,
+                            Toast.LENGTH_LONG).show()
                     }
 
                     LazyColumn() {

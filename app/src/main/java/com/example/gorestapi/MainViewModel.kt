@@ -72,8 +72,10 @@ class MainViewModel: ViewModel() {
         }
 
         viewModelScope.launch {
+            errorMessage.value = ""
+
             try {
-                val response = httpClient?.post("https://_gorest.co.in/public/v2/users") {
+                val response = httpClient?.post("https://gorest.co.in/public/v2/users") {
                     headers {
                         append(HttpHeaders.Accept, "application/json")
                         append(HttpHeaders.Authorization, authValue)
@@ -88,7 +90,9 @@ class MainViewModel: ViewModel() {
                 if (response?.status?.value.toString().startsWith("2")) {
                     getUsers()
                 } else { // Todo: Display error-messages.
-                    throw Exception("Status code: ${response?.status?.value.toString()}")
+                    val message = "Status code: ${response?.status?.value.toString()}"
+                    errorMessage.value = message
+                    throw Exception(message)
                 }
             } catch (exc: Exception) {
                 println(exc.message)
@@ -100,6 +104,8 @@ class MainViewModel: ViewModel() {
 
     fun getUser(uid: Int) {
         viewModelScope.launch {
+            errorMessage.value = ""
+
             try {
                 val response = httpClient?.get("https://gorest.co.in/public/v2/users/${uid}") {
                     headers {
@@ -109,9 +115,9 @@ class MainViewModel: ViewModel() {
                 }
                 _user.value = response?.body<User>()
             } catch (exc: Exception) {
-                println(exc.message)
-                println(" ---------- ")
-                println(exc.stackTrace)
+                val message = exc.message
+                errorMessage.value = message ?: ""
+                println(message ?: "")
             }
         }
     }
@@ -119,7 +125,7 @@ class MainViewModel: ViewModel() {
     fun getUsers() {
         viewModelScope.launch {
             isLoading.value = true
-            delay(5000)
+            errorMessage.value = ""
 
             try {
                 val response = httpClient?.get("https://gorest.co.in/public/v2/users/") {
@@ -135,7 +141,10 @@ class MainViewModel: ViewModel() {
                     println("Response error-code: ${response?.status?.value.toString()}")
                 }
             } catch (exc: Exception) {
-                println(exc.message)
+                val message = exc.message
+                errorMessage.value = message ?: ""
+
+                println(message ?: "")
                 println(" ---------- ")
                 println(exc.stackTrace)
             } finally {
@@ -146,6 +155,8 @@ class MainViewModel: ViewModel() {
 
     fun deleteUser(uid: Int) {
         viewModelScope.launch {
+            errorMessage.value = ""
+
             val urlStr = "https://gorest.co.in/public/v2/users/${uid}"
             try {
                 httpClient?.delete(urlString = urlStr) {
@@ -154,8 +165,10 @@ class MainViewModel: ViewModel() {
                         append(HttpHeaders.Accept, "application/json")
                     }
                 }
-            } catch (exp: Exception) {
-                println(exp.message)
+            } catch (exc: Exception) {
+                val message = exc.message
+                errorMessage.value = message ?: ""
+                println(message ?: "")
             }
 
             getUsers()
@@ -168,6 +181,8 @@ class MainViewModel: ViewModel() {
         }
 
         viewModelScope.launch {
+            errorMessage.value = ""
+
             try {
                 httpClient?.put("https://gorest.co.in/public/v2/users/${uid}") {
                     headers {
@@ -183,8 +198,9 @@ class MainViewModel: ViewModel() {
                     getUser(uid = uid)
                 }
             } catch (exc: Exception) {
-                println(exc.message)
-                println(exc.stackTrace)
+                val message = exc.message
+                errorMessage.value = message ?: ""
+                println(message)
             }
         }
     }
