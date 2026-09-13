@@ -1,6 +1,7 @@
 package com.example.gorestapi
 
 import android.annotation.SuppressLint
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -161,6 +162,7 @@ fun UserDetails(backStack: SnapshotStateList<Any>, mainVM: MainViewModel, uid: I
                     mainVM.updateUser(uid = uid, userName = name,
                         email = email, gender = gender,
                         status = status)
+                    mainVM.getUsers()
                 }
             }
         }
