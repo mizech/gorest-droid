@@ -65,7 +65,6 @@ class MainViewModel: ViewModel() {
         return errorMessage.value.isEmpty()
     }
 
-    // Todo: List isn't updated, when navigating back from details.
     fun addUser(userName: String, email: String, gender: String, status: String) {
         if (!validateUserData(userName = userName, email = email)) {
             return
